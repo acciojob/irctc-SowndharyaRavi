@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class TrainService {
@@ -64,16 +65,13 @@ public class TrainService {
         Station fromStation=seatAvailabilityEntryDto.getFromStation();
         Station toStation=seatAvailabilityEntryDto.getToStation();
 
-        Train train;
-        try{
-            train=trainRepository.findById(trainId).get();
-        }
-        catch (Exception e){
-            throw new Exception("Train with ID "+trainId+" not found");
+        Optional<Train> train = trainRepository.findById(trainId);
+        if (train == null) {
+            throw new Exception("Train with ID " + trainId + " not found");
         }
 
         int bookedSeats=0;
-        List<Ticket>ticketsList=train.getBookedTickets();
+        List<Ticket>ticketsList=train.get().getBookedTickets();
         if(ticketsList!=null){
             for(Ticket ticket:ticketsList){
                 if(ticket.getFromStation().equals(fromStation) && ticket.getToStation().equals(toStation)){
@@ -82,7 +80,7 @@ public class TrainService {
             }
         }
 
-        int availableSeats=train.getNoOfSeats()-bookedSeats;
+        int availableSeats=train.get().getNoOfSeats()-bookedSeats;
        return availableSeats;
     }
 
