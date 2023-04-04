@@ -50,7 +50,7 @@ public class TrainService {
         return savedTrain.getTrainId();
     }
 
-    public Integer calculateAvailableSeats(SeatAvailabilityEntryDto seatAvailabilityEntryDto) throws Exception {
+    public Integer calculateAvailableSeats(SeatAvailabilityEntryDto seatAvailabilityEntryDto){
 
         //Calculate the total seats available
         //Suppose the route is A B C D
@@ -65,13 +65,14 @@ public class TrainService {
         Station fromStation=seatAvailabilityEntryDto.getFromStation();
         Station toStation=seatAvailabilityEntryDto.getToStation();
 
-        Optional<Train> train = trainRepository.findById(trainId);
+      /*  Optional<Train> train = trainRepository.findById(trainId);
         if (train == null) {
             throw new Exception("Train with ID " + trainId + " not found");
-        }
+        }*/
+        Train train=trainRepository.findById(trainId).get();
 
         int bookedSeats=0;
-        List<Ticket>ticketsList=train.get().getBookedTickets();
+        List<Ticket>ticketsList=train.getBookedTickets();
         if(ticketsList!=null){
             for(Ticket ticket:ticketsList){
                 if(ticket.getFromStation().equals(fromStation) && ticket.getToStation().equals(toStation)){
@@ -80,7 +81,7 @@ public class TrainService {
             }
         }
 
-        int availableSeats=train.get().getNoOfSeats()-bookedSeats;
+        int availableSeats=train.getNoOfSeats()-bookedSeats;
        return availableSeats;
     }
 
